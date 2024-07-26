@@ -17,13 +17,13 @@ def unauthenticated_user(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-# Home view - Only accessible to authenticated users
+# Home view
 @login_required(login_url='login')
 def home(request):
     products = Product.objects.all()
     return render(request, 'home.html', {'products': products})
 
-# Login view - Accessible to unauthenticated users only
+# Login view
 @unauthenticated_user
 def login_user(request):
     if request.method == "POST":
@@ -43,10 +43,10 @@ def login_user(request):
 # Logout view
 def logout_user(request):
     logout(request)
-    messages.success(request, "You have been logged out... Thanks for stopping by...")
+    messages.success(request, "You have been logged out")
     return redirect('login')
 
-# Register view - Accessible to all users
+# Register view
 @unauthenticated_user
 def register_user(request):
     form = SignUpForm()
@@ -67,13 +67,13 @@ def register_user(request):
     else:
         return render(request, 'register.html', {'form': form})
 
-# Product view - Only accessible to authenticated users
+# Product view
 @login_required(login_url='login')
 def product(request, pk):
     product = Product.objects.get(id=pk)
     return render(request, 'product.html', {'product': product})
 
-# Category view - Only accessible to authenticated users
+# Category view
 @login_required(login_url='login')
 def category(request, foo):
     foo = foo.replace('-', ' ')
@@ -85,13 +85,13 @@ def category(request, foo):
         messages.error(request, "That Category Doesn't Exist...")
         return redirect('home')
 
-# Category summary view - Only accessible to authenticated users
+# Category summary view
 @login_required(login_url='login')
 def category_summary(request):
     categories = Category.objects.all()
     return render(request, 'category_summary.html', {"categories": categories})
 
-# Update user view - Only accessible to authenticated users
+# Update user view
 @login_required(login_url='login')
 def update_user(request):
     if request.user.is_authenticated:
@@ -108,7 +108,7 @@ def update_user(request):
         messages.error(request, "You Must Be Logged In To Access That Page!!")
         return redirect('home')
 
-# Update password view - Only accessible to authenticated users
+# Update password view
 @login_required(login_url='login')
 def update_password(request):
     if request.user.is_authenticated:
@@ -117,7 +117,7 @@ def update_password(request):
             form = ChangePasswordForm(current_user, request.POST)
             if form.is_valid():
                 form.save()
-                messages.success(request, "Your Password Has Been Updated...")
+                messages.success(request, "Your Password Has Been Updated")
                 login(request, current_user)
                 return redirect('update_user')
             else:
@@ -128,5 +128,5 @@ def update_password(request):
             form = ChangePasswordForm(current_user)
             return render(request, "update_password.html", {'form': form})
     else:
-        messages.error(request, "You Must Be Logged In To View That Page...")
+        messages.error(request, "You Must Be Logged In To View That Page")
         return redirect('home')
